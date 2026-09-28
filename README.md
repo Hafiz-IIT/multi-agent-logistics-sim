@@ -1,35 +1,46 @@
 # Multi-Agent Logistics Simulator
 
-> **A small coordination testbed for capacity-constrained task allocation among moving logistics agents.**
+> Transparent multi-agent logistics allocation simulator with distance, load capacity and task feasibility constraints.
 
-The older multi-agent logistics and automated-agent ideas need a concrete baseline before introducing MARL. This repository models agents, tasks, capacity, location, and greedy allocation so more advanced coordination methods have an inspectable comparator.
+## Status
+**Reproducible simulation/research prototype** with executable code, tests, CI, architecture, evaluation and roadmap documentation.
 
-## Implemented
-- agent position/capacity state
-- task location/load model
-- Euclidean distance
-- nearest-feasible assignment
-- capacity updates
-- agent position updates
-- unassigned-task reporting
+## Problem
+Fleet coordination requires assigning tasks across multiple agents without violating capacity while controlling travel cost and imbalance.
 
-## Run
+## Architecture
+Agent state + task set → feasibility filter → distance score → assignment → capacity/location update → unassigned-task report.
+
+## Quick start
 ```bash
 python -m unittest discover -s tests -v
 python multi_agent_logistics_sim.py
 ```
 
-## Repository map
-`multi_agent_logistics_sim.py` core · `tests/` tests · `examples/` fixtures · `docs/architecture.md` design · `docs/research-agenda.md` experiments · `STATUS.md` claims · `CITATION.cff` citation
-
-## Pipeline
-**agents + tasks → feasibility → distance → assignment → state update → unserved tasks**
+## Implemented
+- Agent position/capacity state
+- Task load/location state
+- Euclidean distance scoring
+- Feasibility filtering
+- Greedy nearest-agent allocation
+- Capacity updates
+- Unassigned reporting
+- Tests and CI
 
 ## Research lineage
-This consolidates older multi-agent logistics coordination, cargo allocation, automated-agent, and distributed-agent research directions.
+- *Multi-Agent Coordination via Linear Statistical Models and Reinforcement Learning*
+- *Integrated Linear Models for Multi-Agent Systems*
+- *Scalable Architectures for Distributed Intelligent Agents*
 
-## Evaluation direction
-Stress the greedy allocator with clustered demand, asymmetric capacity, task ordering, and adversarial demand distributions; later compare against auction, optimization, or multi-agent RL policies.
+## Evaluation
+Current tests cover nearest-feasible choice and capacity exhaustion; future experiments should compare centralized, auction and learned policies.
 
-## Maturity
-**Research prototype.** This is not multi-agent reinforcement learning, a real dispatch system, or an optimal assignment solver.
+## Limitations
+- Greedy centralized allocator
+- No communication model
+- No time windows
+- No RL policy yet
+- Synthetic coordinates only
+
+## License
+MIT.

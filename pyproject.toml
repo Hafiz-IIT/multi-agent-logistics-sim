@@ -1,0 +1,14 @@
+[build-system]
+requires=["setuptools>=68"]
+build-backend="setuptools.build_meta"
+
+[project]
+name="multi-agent-logistics-sim"
+version="0.1.0"
+description="Transparent multi-agent logistics allocation simulator with distance, load capacity and task feasibility constraints."
+requires-python=">=3.10"
+license={text="MIT"}
+authors=[{name="Syed Hafiz Ali"}]
+
+[tool.setuptools]
+py-modules=["multi_agent_logistics_sim"]
