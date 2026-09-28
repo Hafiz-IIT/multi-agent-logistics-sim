@@ -44,3 +44,7 @@ Current tests cover nearest-feasible choice and capacity exhaustion; future expe
 
 ## License
 MIT.
+
+## Extended implementation
+
+- `auction_allocator.py` adds feasible-agent bidding with travel/load scoring and explicit assignment results.
