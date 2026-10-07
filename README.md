@@ -1,50 +1,50 @@
 # Multi-Agent Logistics Simulator
 
-> Transparent multi-agent logistics allocation simulator with distance, load capacity and task feasibility constraints.
+<p align="center"><strong>Fleet Coordination Under Capacity Constraints</strong><br/><sub>Transparent allocation experiments for agents, tasks, travel and load.</sub></p>
 
-## Status
-**Reproducible simulation/research prototype** with executable code, tests, CI, architecture, evaluation and roadmap documentation.
+<p align="center"><img src="https://img.shields.io/badge/status-reproducible%20simulation-blue" alt="Simulation"/> <img src="https://img.shields.io/badge/focus-multi--agent%20allocation-purple" alt="Allocation"/></p>
 
-## Problem
-Fleet coordination requires assigning tasks across multiple agents without violating capacity while controlling travel cost and imbalance.
+## Question
 
-## Architecture
-Agent state + task set → feasibility filter → distance score → assignment → capacity/location update → unassigned-task report.
+**How should logistics tasks be allocated when agents differ in location and remaining capacity?**
 
-## Quick start
-```bash
-python -m unittest discover -s tests -v
-python multi_agent_logistics_sim.py
+```
+Agents + tasks
+      ↓
+Feasibility filter
+      ↓
+Distance / load score
+      ↓
+Assignment
+      ↓
+Capacity + location update
+      ↓
+Unassigned-task report
 ```
 
+## Try it
+
+```bash
+python multi_agent_logistics_sim.py
+python -m unittest discover -s tests -v
+```
+
+`auction_allocator.py` adds a bidding-based allocation strategy with explicit winning bids and unassigned tasks.
+
 ## Implemented
-- Agent position/capacity state
-- Task load/location state
-- Euclidean distance scoring
-- Feasibility filtering
-- Greedy nearest-agent allocation
-- Capacity updates
-- Unassigned reporting
-- Tests and CI
 
-## Research lineage
-- *Multi-Agent Coordination via Linear Statistical Models and Reinforcement Learning*
-- *Integrated Linear Models for Multi-Agent Systems*
-- *Scalable Architectures for Distributed Intelligent Agents*
+- agent position/capacity state
+- task load/location state
+- feasibility filtering
+- distance scoring
+- greedy allocation baseline
+- auction-style allocation
+- capacity updates
+- explicit unassigned reporting
+- deterministic CI
 
-## Evaluation
-Current tests cover nearest-feasible choice and capacity exhaustion; future experiments should compare centralized, auction and learned policies.
+## Research boundary
 
-## Limitations
-- Greedy centralized allocator
-- No communication model
-- No time windows
-- No RL policy yet
-- Synthetic coordinates only
+Simulation only. No claim of deployment in a real fleet or optimality under real-world routing constraints.
 
-## License
-MIT.
-
-## Extended implementation
-
-- `auction_allocator.py` adds feasible-agent bidding with travel/load scoring and explicit assignment results.
+Related: [Logistics Optimization Lab](https://github.com/Hafiz-IIT/logistics-optimization-lab) · [Port Operations Simulator](https://github.com/Hafiz-IIT/port-operations-simulator)
