@@ -20,6 +20,17 @@ class MultiAgentLogisticsTests(unittest.TestCase):
         self.assertEqual(len(result["assignments"]), 1)
         self.assertEqual(len(result["unassigned"]), 1)
 
+    def test_inputs_are_not_mutated(self):
+        agents = [Agent("A", 0, 0, 3)]
+        assign(agents, [Task("T1", 5, 5, 2)])
+        self.assertEqual((agents[0].x, agents[0].y, agents[0].remaining_capacity), (0, 0, 3))
+
+    def test_duplicate_ids_and_invalid_loads_are_rejected(self):
+        with self.assertRaises(ValueError):
+            assign([Agent("A", 0, 0, 5)], [Task("T", 0, 0, 1), Task("T", 1, 1, 1)])
+        with self.assertRaises(ValueError):
+            Task("bad", 0, 0, -1)
+
 
 if __name__ == "__main__":
     unittest.main()
