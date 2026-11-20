@@ -37,6 +37,21 @@ class MultiAgentLogisticsTests(unittest.TestCase):
         with self.assertRaises(OverflowError):
             assign(agents, tasks)
 
+    def test_mutated_agent_and_normalized_duplicate_names_are_rejected(self):
+        agent = Agent("A", 0, 0, 5)
+        agent.remaining_capacity = float("nan")
+        with self.assertRaises(ValueError):
+            assign([agent], [Task("T", 0, 0, 1)])
+        with self.assertRaises(ValueError):
+            assign(
+                [Agent(" A ", 0, 0, 5), Agent("A", 1, 1, 5)],
+                [Task("T", 0, 0, 1)],
+            )
+
+    def test_extremely_large_integer_task_values_are_rejected(self):
+        with self.assertRaises(ValueError):
+            Task("T", 0, 0, 10 ** 10000)
+
     def test_duplicate_ids_and_invalid_loads_are_rejected(self):
         with self.assertRaises(ValueError):
             assign([Agent("A", 0, 0, 5)], [Task("T", 0, 0, 1), Task("T", 1, 1, 1)])
