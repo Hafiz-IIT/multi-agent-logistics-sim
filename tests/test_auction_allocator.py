@@ -22,6 +22,12 @@ class AuctionAllocatorTests(unittest.TestCase):
         auction_assign(agents, [Task("T", 2, 0, 2)])
         self.assertEqual((agents[0].x, agents[0].remaining_capacity), (0, 5))
 
+    def test_boolean_penalty_and_invalid_direct_bid_rejected(self):
+        with self.assertRaises(ValueError):
+            auction_assign([Agent("A", 0, 0, 5)], [Task("T", 0, 0, 1)], load_penalty=True)
+        with self.assertRaises(TypeError):
+            bid(None, Task("T", 0, 0, 1))
+
     def test_negative_load_penalty_is_rejected(self):
         with self.assertRaises(ValueError):
             auction_assign([Agent("A", 0, 0, 5)], [Task("T", 0, 0, 1)], load_penalty=-1)
