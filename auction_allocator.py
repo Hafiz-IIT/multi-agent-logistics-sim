@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import hypot
+from math import hypot, isfinite
 
-from multi_agent_logistics_sim import Agent, Task
+from multi_agent_logistics_sim import Agent, Task, _finite_float, prepare_allocation_inputs
 
 
 @dataclass(frozen=True)
@@ -14,13 +14,24 @@ class Bid:
 
 
 def bid(agent: Agent, task: Task, *, load_penalty: float = 0.1) -> Bid | None:
+    load_penalty = _finite_float("load_penalty", load_penalty)
+    if load_penalty < 0:
+        raise ValueError("load_penalty must be non-negative")
+    if not isinstance(agent, Agent) or not isinstance(task, Task):
+        raise TypeError("bid requires Agent and Task values")
+    # Agent is intentionally mutable for internal allocation; validate direct
+    # callers again because an Agent may have changed since construction.
+    agent = Agent(agent.name, agent.x, agent.y, agent.remaining_capacity)
     if agent.remaining_capacity < task.load:
         return None
     travel = hypot(agent.x - task.x, agent.y - task.y)
     utilization_penalty = load_penalty * (
         task.load / max(agent.remaining_capacity, 1e-12)
     )
-    return Bid(agent.name, task.task_id, travel + utilization_penalty)
+    score = travel + utilization_penalty
+    if not isfinite(score):
+        raise OverflowError("bid score is not finite")
+    return Bid(agent.name, task.task_id, score)
 
 
 def auction_assign(
@@ -29,14 +40,20 @@ def auction_assign(
     *,
     load_penalty: float = 0.1,
 ) -> dict:
+    working_agents = prepare_allocation_inputs(agents, tasks)
+    load_penalty = _finite_float("load_penalty", load_penalty)
+    if load_penalty < 0:
+        raise ValueError("load_penalty must be non-negative")
     assignments: dict[str, str] = {}
     winning_bids: dict[str, float] = {}
     unassigned: list[str] = []
 
+    # Sequential greedy auction: each task is allocated in task-id order.
+    # This is a heuristic, not a globally optimal combinatorial auction.
     for task in sorted(tasks, key=lambda t: t.task_id):
         candidates = [
             candidate
-            for agent in agents
+            for agent in working_agents
             if (candidate := bid(agent, task, load_penalty=load_penalty)) is not None
         ]
         if not candidates:
@@ -44,7 +61,7 @@ def auction_assign(
             continue
 
         winner = min(candidates, key=lambda b: (b.score, b.agent))
-        agent = next(a for a in agents if a.name == winner.agent)
+        agent = next(a for a in working_agents if a.name == winner.agent)
         assignments[task.task_id] = agent.name
         winning_bids[task.task_id] = winner.score
         agent.remaining_capacity -= task.load
