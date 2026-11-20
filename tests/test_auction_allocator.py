@@ -28,6 +28,19 @@ class AuctionAllocatorTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             bid(None, Task("T", 0, 0, 1))
 
+    def test_direct_bid_revalidates_mutated_agent_state(self):
+        agent = Agent("A", 0, 0, 5)
+        agent.x = float("nan")
+        with self.assertRaises(ValueError):
+            bid(agent, Task("T", 0, 0, 1))
+
+    def test_extremely_large_penalty_is_rejected_cleanly(self):
+        with self.assertRaises(ValueError):
+            auction_assign(
+                [Agent("A", 0, 0, 5)], [Task("T", 0, 0, 1)],
+                load_penalty=10 ** 10000,
+            )
+
     def test_negative_load_penalty_is_rejected(self):
         with self.assertRaises(ValueError):
             auction_assign([Agent("A", 0, 0, 5)], [Task("T", 0, 0, 1)], load_penalty=-1)
