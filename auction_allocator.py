@@ -37,7 +37,7 @@ def auction_assign(
     load_penalty: float = 0.1,
 ) -> dict:
     working_agents = prepare_allocation_inputs(agents, tasks)
-    if not isfinite(load_penalty) or load_penalty < 0:
+    if isinstance(load_penalty, bool) or not isinstance(load_penalty, (int, float)) or not isfinite(load_penalty) or load_penalty < 0:
         raise ValueError("load_penalty must be finite and non-negative")
     assignments: dict[str, str] = {}
     winning_bids: dict[str, float] = {}
