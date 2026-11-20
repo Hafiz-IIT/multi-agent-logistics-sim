@@ -52,7 +52,10 @@ def prepare_allocation_inputs(agents: list[Agent], tasks: list[Task]) -> list[Ag
 
 
 def distance(agent: Agent, task: Task) -> float:
-    return hypot(agent.x - task.x, agent.y - task.y)
+    value = hypot(agent.x - task.x, agent.y - task.y)
+    if not isfinite(value):
+        raise OverflowError("distance is not representable as a finite float")
+    return value
 
 
 def assign(agents: list[Agent], tasks: list[Task]) -> dict:
