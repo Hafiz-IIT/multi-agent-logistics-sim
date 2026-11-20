@@ -31,6 +31,12 @@ class MultiAgentLogisticsTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             Task("T", 0, 0, float("nan"))
 
+    def test_distance_overflow_is_rejected_instead_of_assigning_infinite_cost(self):
+        agents = [Agent("A", -1e308, 0, 5)]
+        tasks = [Task("T", 1e308, 0, 1)]
+        with self.assertRaises(OverflowError):
+            assign(agents, tasks)
+
     def test_duplicate_ids_and_invalid_loads_are_rejected(self):
         with self.assertRaises(ValueError):
             assign([Agent("A", 0, 0, 5)], [Task("T", 0, 0, 1), Task("T", 1, 1, 1)])
