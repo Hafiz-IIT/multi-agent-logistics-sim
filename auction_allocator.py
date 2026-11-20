@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from math import hypot, isfinite
 
-from multi_agent_logistics_sim import Agent, Task, prepare_allocation_inputs
+from multi_agent_logistics_sim import Agent, Task, _finite_float, prepare_allocation_inputs
 
 
 @dataclass(frozen=True)
@@ -14,10 +14,14 @@ class Bid:
 
 
 def bid(agent: Agent, task: Task, *, load_penalty: float = 0.1) -> Bid | None:
-    if isinstance(load_penalty, bool) or not isinstance(load_penalty, (int, float)) or not isfinite(load_penalty) or load_penalty < 0:
-        raise ValueError("load_penalty must be finite and non-negative")
+    load_penalty = _finite_float("load_penalty", load_penalty)
+    if load_penalty < 0:
+        raise ValueError("load_penalty must be non-negative")
     if not isinstance(agent, Agent) or not isinstance(task, Task):
         raise TypeError("bid requires Agent and Task values")
+    # Agent is intentionally mutable for internal allocation; validate direct
+    # callers again because an Agent may have changed since construction.
+    agent = Agent(agent.name, agent.x, agent.y, agent.remaining_capacity)
     if agent.remaining_capacity < task.load:
         return None
     travel = hypot(agent.x - task.x, agent.y - task.y)
@@ -37,8 +41,9 @@ def auction_assign(
     load_penalty: float = 0.1,
 ) -> dict:
     working_agents = prepare_allocation_inputs(agents, tasks)
-    if isinstance(load_penalty, bool) or not isinstance(load_penalty, (int, float)) or not isfinite(load_penalty) or load_penalty < 0:
-        raise ValueError("load_penalty must be finite and non-negative")
+    load_penalty = _finite_float("load_penalty", load_penalty)
+    if load_penalty < 0:
+        raise ValueError("load_penalty must be non-negative")
     assignments: dict[str, str] = {}
     winning_bids: dict[str, float] = {}
     unassigned: list[str] = []
