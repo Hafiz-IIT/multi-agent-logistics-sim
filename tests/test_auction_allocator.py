@@ -13,6 +13,10 @@ class AuctionAllocatorTests(unittest.TestCase):
         result = auction_assign(agents, [Task("T", 1, 0, 1)])
         self.assertEqual(result["assignments"]["T"], "A")
 
+    def test_negative_load_penalty_is_rejected(self):
+        with self.assertRaises(ValueError):
+            bid(Agent("A", 0, 0, 5), Task("T", 0, 0, 1), load_penalty=-0.1)
+
     def test_unassigned_task_is_explicit(self):
         result = auction_assign([Agent("A", 0, 0, 1)], [Task("T", 0, 0, 2)])
         self.assertEqual(result["unassigned"], ["T"])
