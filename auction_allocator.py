@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import hypot
+from math import hypot, isfinite
 
-from multi_agent_logistics_sim import Agent, Task
+from multi_agent_logistics_sim import Agent, Task, validate_inputs
 
 
 @dataclass(frozen=True)
@@ -14,6 +14,9 @@ class Bid:
 
 
 def bid(agent: Agent, task: Task, *, load_penalty: float = 0.1) -> Bid | None:
+    validate_inputs([agent], [task])
+    if not isfinite(float(load_penalty)) or load_penalty < 0:
+        raise ValueError("load_penalty must be finite and non-negative")
     if agent.remaining_capacity < task.load:
         return None
     travel = hypot(agent.x - task.x, agent.y - task.y)
@@ -29,6 +32,9 @@ def auction_assign(
     *,
     load_penalty: float = 0.1,
 ) -> dict:
+    validate_inputs(agents, tasks)
+    if not isfinite(float(load_penalty)) or load_penalty < 0:
+        raise ValueError("load_penalty must be finite and non-negative")
     assignments: dict[str, str] = {}
     winning_bids: dict[str, float] = {}
     unassigned: list[str] = []
