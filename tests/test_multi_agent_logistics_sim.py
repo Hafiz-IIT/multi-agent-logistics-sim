@@ -25,6 +25,12 @@ class MultiAgentLogisticsTests(unittest.TestCase):
         assign(agents, [Task("T1", 5, 5, 2)])
         self.assertEqual((agents[0].x, agents[0].y, agents[0].remaining_capacity), (0, 0, 3))
 
+    def test_boolean_and_nonfinite_agent_task_values_rejected(self):
+        with self.assertRaises(ValueError):
+            Agent("A", True, 0, 5)
+        with self.assertRaises(ValueError):
+            Task("T", 0, 0, float("nan"))
+
     def test_duplicate_ids_and_invalid_loads_are_rejected(self):
         with self.assertRaises(ValueError):
             assign([Agent("A", 0, 0, 5)], [Task("T", 0, 0, 1), Task("T", 1, 1, 1)])
