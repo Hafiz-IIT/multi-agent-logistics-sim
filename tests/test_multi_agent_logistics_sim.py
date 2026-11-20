@@ -14,6 +14,16 @@ class MultiAgentLogisticsTests(unittest.TestCase):
         result = assign(agents, [Task("T", 0, 0, 2)])
         self.assertEqual(result["unassigned"], ["T"])
 
+    def test_nonpositive_task_load_is_rejected(self):
+        with self.assertRaises(ValueError):
+            assign([Agent("A", 0, 0, 3)], [Task("T", 0, 0, 0)])
+        with self.assertRaises(ValueError):
+            assign([Agent("A", 0, 0, 3)], [Task("T", 0, 0, -1)])
+
+    def test_duplicate_task_ids_are_rejected(self):
+        with self.assertRaises(ValueError):
+            assign([Agent("A", 0, 0, 3)], [Task("T", 0, 0, 1), Task("T", 1, 1, 1)])
+
     def test_capacity_updates_across_tasks(self):
         agents = [Agent("A", 0, 0, 3)]
         result = assign(agents, [Task("T1", 0, 0, 2), Task("T2", 0, 0, 2)])
