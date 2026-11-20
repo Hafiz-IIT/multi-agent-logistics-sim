@@ -14,15 +14,20 @@ class Bid:
 
 
 def bid(agent: Agent, task: Task, *, load_penalty: float = 0.1) -> Bid | None:
-    if not isfinite(load_penalty) or load_penalty < 0:
+    if isinstance(load_penalty, bool) or not isinstance(load_penalty, (int, float)) or not isfinite(load_penalty) or load_penalty < 0:
         raise ValueError("load_penalty must be finite and non-negative")
+    if not isinstance(agent, Agent) or not isinstance(task, Task):
+        raise TypeError("bid requires Agent and Task values")
     if agent.remaining_capacity < task.load:
         return None
     travel = hypot(agent.x - task.x, agent.y - task.y)
     utilization_penalty = load_penalty * (
         task.load / max(agent.remaining_capacity, 1e-12)
     )
-    return Bid(agent.name, task.task_id, travel + utilization_penalty)
+    score = travel + utilization_penalty
+    if not isfinite(score):
+        raise OverflowError("bid score is not finite")
+    return Bid(agent.name, task.task_id, score)
 
 
 def auction_assign(
