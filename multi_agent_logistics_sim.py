@@ -14,7 +14,8 @@ class Agent:
     def __post_init__(self):
         if not isinstance(self.name, str) or not self.name.strip():
             raise ValueError("agent name is required")
-        if any(not isfinite(value) for value in (self.x, self.y, self.remaining_capacity)):
+        if any(isinstance(value, bool) or not isinstance(value, (int, float)) or not isfinite(value)
+               for value in (self.x, self.y, self.remaining_capacity)):
             raise ValueError("agent coordinates and capacity must be finite")
         if self.remaining_capacity < 0:
             raise ValueError("agent capacity must be non-negative")
@@ -30,11 +31,14 @@ class Task:
     def __post_init__(self):
         if not isinstance(self.task_id, str) or not self.task_id.strip():
             raise ValueError("task_id is required")
-        if any(not isfinite(value) for value in (self.x, self.y, self.load)) or self.load <= 0:
+        if any(isinstance(value, bool) or not isinstance(value, (int, float)) or not isfinite(value)
+               for value in (self.x, self.y, self.load)) or self.load <= 0:
             raise ValueError("task coordinates must be finite and load must be finite and positive")
 
 
 def prepare_allocation_inputs(agents: list[Agent], tasks: list[Task]) -> list[Agent]:
+    if not isinstance(agents, list) or not isinstance(tasks, list):
+        raise ValueError("agents and tasks must be lists")
     if any(not isinstance(agent, Agent) for agent in agents) or any(not isinstance(task, Task) for task in tasks):
         raise ValueError("agents and tasks must contain Agent and Task instances")
     agent_names = [agent.name for agent in agents]
